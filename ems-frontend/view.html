@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Employee</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Employee Details</h1>
+
+    <div id="employee-details" class="employee-card">
+      <!-- Employee details will appear here -->
+    </div>
+
+    <br />
+    <button onclick="location.href='index.html'" class="edit-btn">Back to List</button>
+  </div>
+
+  <script>
+    const API_BASE_URL = "http://localhost:8080/api/employees";
+    const urlParams = new URLSearchParams(window.location.search);
+    const employeeId = urlParams.get("id");
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetch(`${API_BASE_URL}/${employeeId}`)
+        .then((response) => response.json())
+        .then((employee) => {
+          const container = document.getElementById("employee-details");
+          container.innerHTML = `
+            <p><strong>ID:</strong> ${employee.id}</p>
+            <p><strong>First Name:</strong> ${employee.firstName}</p>
+            <p><strong>Last Name:</strong> ${employee.lastName}</p>
+            <p><strong>Email:</strong> ${employee.email}</p>
+          `;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Failed to load employee details.");
+        });
+    });
+  </script>
+</body>
+</html>
