@@ -1,14 +1,27 @@
-# Use official OpenJDK 17 base image
-FROM openjdk:17-jdk-slim
+# Use a base image with Java and Maven pre-installed
+FROM maven:3.9.6-eclipse-temurin-17 as builder
 
-# Set working directory inside container
+# Set working directory
 WORKDIR /app
 
-# Copy all files into the container
+# Copy the pom.xml and download dependencies first (use cache)
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copy the entire project
 COPY . .
 
-# Build the application using Maven Wrapper if present, or fallback to Maven
-RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+# Build the application
+RUN mvn clean package -DskipTests
 
-# Run the generated jar file
-CMD ["java", "-jar", "target/ems-backend-0.0.1-SNAPSHOT.jar"]
+# ---------------------------
+# Create the final image with only the JAR
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+# Copy the JAR from the builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
+# Run the app
+CMD ["java", "-jar", "app.jar"]
