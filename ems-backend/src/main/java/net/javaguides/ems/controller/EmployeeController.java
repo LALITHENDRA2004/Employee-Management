@@ -2,7 +2,9 @@ package net.javaguides.ems.controller;
 
 import lombok.AllArgsConstructor;
 import net.javaguides.ems.dto.EmployeeDto;
+import net.javaguides.ems.entity.User;
 import net.javaguides.ems.service.EmployeeService;
+import net.javaguides.ems.service.UserService;
 
 import java.util.List;
 
@@ -12,6 +14,8 @@ import org.springframework.http.HttpStatus;
 // ResponseEntity is used to send back data + status code (like 201 created)
 // to the client
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +39,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/employees")
 public class EmployeeController {
     
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
+    private final UserService userService;
+
+    private User getCurrentUser(UserDetails userDetails) {
+        return userService.findByUserName(userDetails.getUsername())
+            .orElseThrow(() -> new RuntimeException("User" + userDetails.getUsername() + " not found: "));
+    }
 
     // @PostMapping indicates that the below method will run when someone 
     // sends a POST request to /api/employees. It is used to add an employee. 
@@ -46,13 +56,15 @@ public class EmployeeController {
     
     // Build Add Employee REST API
     @PostMapping
-    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto, 
+                                                        @AuthenticationPrincipal UserDetails userDetails) {
+        User user = getCurrentUser(userDetails);
         // here employeeService is a reference variable of interface EmployeeService
         // But it only have method declaration but not definition. 
         // Here the Spring Boot creates an object by itself by finding the class 
         // which implements the interface. 
         // It finds the class with the help of the annotation @Service 
-        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
+        EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto, user);
         // HttpStatus.CREATED sends the status (201 created) to indicate that
         // successful post has been done. 
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
@@ -62,15 +74,18 @@ public class EmployeeController {
     // The employeeId is mapped with path (id) using @PathVariable("id")
     // Build Get Employee REST API
     @GetMapping("{id}")
-    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable("id") Long employeeId) {
-        EmployeeDto employeeDto = employeeService.getEmployeeById(employeeId);
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable("id") Long employeeId, 
+                                                        @AuthenticationPrincipal UserDetails userDetails) {
+        User user = getCurrentUser(userDetails);
+        EmployeeDto employeeDto = employeeService.getEmployeeById(employeeId, user);
         return ResponseEntity.ok(employeeDto);
     }
 
     // Build Get All Employees REST API 
     @GetMapping
-    public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
-        List<EmployeeDto> employees = employeeService.getAllEmployees();
+    public ResponseEntity<List<EmployeeDto>> getAllEmployees(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = getCurrentUser(userDetails);
+        List<EmployeeDto> employees = employeeService.getAllEmployees(user);
         return ResponseEntity.ok(employees);
     }
     
@@ -78,14 +93,18 @@ public class EmployeeController {
     // Update Employee REST API 
     @PutMapping("{id}")
     public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Long employeeId, 
-                                                    @RequestBody EmployeeDto updatedEmployee) {
-        EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee);
+                                                    @RequestBody EmployeeDto updatedEmployee, 
+                                                    @AuthenticationPrincipal UserDetails userDetails) {
+        User user = getCurrentUser(userDetails);
+        EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee, user);
         return ResponseEntity.ok(employeeDto);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable("id") Long employeeId) {
-        employeeService.deleteEmployee(employeeId);
+    public ResponseEntity<String> deleteEmployee(@PathVariable("id") Long employeeId, 
+                                                @AuthenticationPrincipal UserDetails userDetails) {
+        User user = getCurrentUser(userDetails);
+        employeeService.deleteEmployee(employeeId, user);
         return ResponseEntity.ok("Employee with id " + employeeId + " deleted successfully.");
     }
 }

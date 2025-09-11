@@ -11,6 +11,19 @@
 <body>
     <!-- Header -->
     <header class="header">
+        <div id="user-info" class="user-info">
+            <button id="profile-button" class="profile-button" aria-haspopup="true" aria-expanded="false"
+                aria-label="User menu"></button>
+        
+            <!-- Hidden user account details panel -->
+            <div id="account-details" class="account-details" style="display: none;">
+                <p><strong>User:</strong> <span id="account-username"></span></p>
+                <button id="logout-button" class="logout-btn">Logout</button>
+            </div>
+        </div>
+
+
+
         <div class="container">
             <div class="header-content">
                 <h1 class="header-title">

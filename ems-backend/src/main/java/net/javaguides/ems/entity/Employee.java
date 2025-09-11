@@ -11,10 +11,11 @@ package net.javaguides.ems.entity;
 // @Column - used to customise column names
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
+import jakarta.persistence.FetchType;
 // @Id - used to indicate primary key
 import jakarta.persistence.Id;
-
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 // Used to auto-increment the primary key 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -47,4 +48,8 @@ public class Employee {
 
     @Column(name = "email_id", nullable = false, unique = true)
     private String email;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }
