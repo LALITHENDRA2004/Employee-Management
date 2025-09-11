@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import net.javaguides.ems.dto.EmployeeDto;
 import net.javaguides.ems.entity.Employee;
+import net.javaguides.ems.entity.User;
 import net.javaguides.ems.exception.ResourceNotFoundException;
 import net.javaguides.ems.mapper.EmployeeMapper;
 import net.javaguides.ems.repository.EmployeeRepository;
@@ -20,12 +21,13 @@ import net.javaguides.ems.service.EmployeeService;
 @AllArgsConstructor
 public class EmployeeServiceImplementation implements EmployeeService {
     // used to interact with the database
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Override
-    public EmployeeDto createEmployee(EmployeeDto employeeDto) {
+    public EmployeeDto createEmployee(EmployeeDto employeeDto, User user) {
         // converts EmployeeDto object to Employee entity to get stored in db
-        Employee employee = EmployeeMapper.mapToEmployee(employeeDto);
+        Employee employee = EmployeeMapper.mapToEmployee(employeeDto, user);
+        employee.setUser(user);
 
         // save() - runs an insert query if employee do not exits 
         //        - runs an update query if it already exists
@@ -36,15 +38,16 @@ public class EmployeeServiceImplementation implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto getEmployeeById(Long employeeId) {
+    public EmployeeDto getEmployeeById(Long employeeId, User user) {
         Employee employee = employeeRepository.findById(employeeId)
+            .filter(emp -> emp.getUser().getId().equals(user.getId()))
             .orElseThrow(() -> new ResourceNotFoundException("Employee do not exist with given id: " + employeeId));
         return EmployeeMapper.mapToEmployeeDto(employee);
     }
 
     @Override
-    public List<EmployeeDto> getAllEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
+    public List<EmployeeDto> getAllEmployees(User user) {
+        List<Employee> employees = employeeRepository.findByUser(user);
         return employees.stream().map((employee) -> EmployeeMapper.mapToEmployeeDto(employee))
             .collect(Collectors.toList());
     } 
@@ -52,9 +55,10 @@ public class EmployeeServiceImplementation implements EmployeeService {
     // Gets an updatedEmployee obj and sets its values to a new object based 
     // on the id and again returns the object 
     @Override
-    public EmployeeDto updateEmployee(Long employeeId, EmployeeDto updatedEmployee) {
-        Employee employee = employeeRepository.findById(employeeId). 
-            orElseThrow(() -> new ResourceNotFoundException("Employee do not exist with given id: " + employeeId));
+    public EmployeeDto updateEmployee(Long employeeId, EmployeeDto updatedEmployee, User user) {
+        Employee employee = employeeRepository.findById(employeeId) 
+            .filter(emp -> emp.getUser().getId().equals(user.getId()))
+            .orElseThrow(() -> new ResourceNotFoundException("Employee do not exist with given id: " + employeeId));
         employee.setFirstName(updatedEmployee.getFirstName());
         employee.setLastName(updatedEmployee.getLastName());
         employee.setEmail(updatedEmployee.getEmail());
@@ -65,9 +69,10 @@ public class EmployeeServiceImplementation implements EmployeeService {
     }
 
     @Override
-    public void deleteEmployee(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId). 
-            orElseThrow(() -> new ResourceNotFoundException("Employee do not exist with given id: " + employeeId));
-        employeeRepository.delete(employee);
+    public void deleteEmployee(Long employeeId, User user) {
+        Employee employee = employeeRepository.findById(employeeId)
+            .filter(emp -> emp.getUser().getId().equals(user.getId()))
+            .orElseThrow(() -> new ResourceNotFoundException("Employee do not exist with given id: " + employeeId));
+            employeeRepository.delete(employee);
     }
 }

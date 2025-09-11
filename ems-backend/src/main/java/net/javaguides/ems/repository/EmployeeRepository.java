@@ -1,10 +1,13 @@
 package net.javaguides.ems.repository;
 
+
 // Purpose of this interface: To define/perform CRUD operations on the 
 // Employee entity
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import net.javaguides.ems.entity.Employee;
+import net.javaguides.ems.entity.User;
+import java.util.List;
 
 // JpaRepository contains all the necessary methods. Just it is enough if 
 // we extend it
@@ -13,5 +16,9 @@ import net.javaguides.ems.entity.Employee;
 // It contains database methods like save(), findById() etc for Employee 
 // entities.
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    // Find all employees for a given user (admin)
+    List<Employee> findByUser(User user);
     
+    // Or if you want to query by user ID directly
+    List<Employee> findByUserId(Long userId);
 }
