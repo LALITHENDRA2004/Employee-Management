@@ -5,11 +5,11 @@ FROM maven:3.9.6-eclipse-temurin-17 as builder
 WORKDIR /app
 
 # Copy the pom.xml and download dependencies first (use cache)
-COPY pom.xml .
+COPY ems-backend/pom.xml .
 RUN mvn dependency:go-offline
 
 # Copy the entire project
-COPY . .
+COPY ems-backend .
 
 # Build the application
 RUN mvn clean package -DskipTests
