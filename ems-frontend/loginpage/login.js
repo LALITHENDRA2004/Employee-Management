@@ -106,19 +106,28 @@ function signup() {
     },
     body: JSON.stringify({
       userName: username,
-      passwordHash: password, 
+      password: password, 
     }),
   })
-    .then(response => {
-      if(response.ok) {
-        localStorage.setItem('loggedInUser', username);
-        alert('Signup successful. Redirecting...');
-        window.location.href = 'http://127.0.0.1:5500/ems-frontend/mainPage.html';
-      } else {
-        return response.text().then(text => {throw new Error(text)});
-      }
-    })
-    .catch(error => alert('Signup failed: ' + error.message));
+  .then(response => {
+    if(response.ok) {
+      return response.json(); 
+    } else {
+      return response.text().then(text => {throw new Error(text)});
+    }
+  })
+  .then(data => {
+    if(data.token) {
+      localStorage.setItem('jwtToken', data.token); 
+      localStorage.setItem('loggedInUser', username);
+      alert('Signup successful. Redirecting...');
+      window.location.href = 'http://127.0.0.1:5500/ems-frontend/mainPage.html';
+    } else {
+      alert('Signup successful but no token returned. Please login.');
+      window.location.href = 'login.html';
+    }
+  })
+  .catch(error => alert('Signup failed: ' + error.message));
 }
 
 function signin() {
@@ -132,18 +141,22 @@ function signin() {
     },
     body: JSON.stringify({
       userName: username,
-      passwordHash: password,
+      password: password,
     }),
   })
     .then(response => response.json())
     .then(data => {
-      if (data.token) {
-        localStorage.setItem('jwtToken', data.token); 
-        localStorage.setItem('loggedInUser', username);
-        alert('Login successful. Redirecting...');
-        window.location.href = 'http://127.0.0.1:5500/ems-frontend/mainPage.html';
-      } else {
-        alert('Login failed. No token returned.');
+      try {
+        if (data.token) {
+          localStorage.setItem('jwtToken', data.token); 
+          localStorage.setItem('loggedInUser', username);
+          alert('Login successful. Redirecting...');
+          window.location.href = 'http://127.0.0.1:5500/ems-frontend/mainPage.html';
+        } else {
+          alert('Invalid username or password.');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
       }
     })
     .catch(error => alert('Error: ' + error.message));

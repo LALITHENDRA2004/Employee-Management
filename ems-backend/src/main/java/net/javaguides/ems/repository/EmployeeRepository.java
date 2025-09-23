@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import net.javaguides.ems.entity.Employee;
 import net.javaguides.ems.entity.User;
 import java.util.List;
+import java.util.Optional;
 
 // JpaRepository contains all the necessary methods. Just it is enough if 
 // we extend it
@@ -21,4 +22,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     
     // Or if you want to query by user ID directly
     List<Employee> findByUserId(Long userId);
+
+     Optional<Employee> findByEmail(String email);
 }

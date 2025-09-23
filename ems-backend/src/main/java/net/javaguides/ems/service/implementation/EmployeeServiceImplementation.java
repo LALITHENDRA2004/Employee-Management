@@ -25,6 +25,13 @@ public class EmployeeServiceImplementation implements EmployeeService {
 
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto, User user) {
+        
+        Employee existingEmployee = employeeRepository.findByEmail(employeeDto.getEmail()).orElse(null);
+        
+        if (existingEmployee != null) {
+            throw new ResourceNotFoundException("Employee with email " + employeeDto.getEmail() + " already exists");
+        }
+
         // converts EmployeeDto object to Employee entity to get stored in db
         Employee employee = EmployeeMapper.mapToEmployee(employeeDto, user);
         employee.setUser(user);

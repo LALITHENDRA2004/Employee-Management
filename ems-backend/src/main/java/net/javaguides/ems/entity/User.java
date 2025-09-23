@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,9 +26,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Username is required")
     @Column(name = "user_name", nullable = false, unique = true, length = 50)
     private String userName;
 
+    @NotBlank(message = "Password is required")
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 

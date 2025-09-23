@@ -39,7 +39,6 @@ async function initializeApp() {
 // Setup Event Listeners
 function setupEventListeners() {
   document.getElementById('addEmployeeBtn').addEventListener('click', openAddModal);
-
   // Modal close buttons
   document.getElementById('closeModalBtn').addEventListener('click', closeEmployeeModal);
   document.getElementById('cancelBtn').addEventListener('click', closeEmployeeModal);
@@ -98,8 +97,6 @@ function initializeUserInfo() {
   profileButton.setAttribute('aria-label', 'User menu');
   // Set username in dropdown
   accountUsername.textContent = loggedInUser;
-  // Username text (optional, if you want visible username somewhere else, otherwise remove it)
-  usernameDisplay.textContent = loggedInUser;
 }
 
 // Toggle user account details panel visibility
@@ -349,7 +346,11 @@ async function handleFormSubmit(e) {
       await createEmployee(employeeData);
     }
     closeEmployeeModal();
-  } catch (_) { } finally {
+  } catch (error) {
+    console.error("Error creating/updating employee:", error);
+    showToast("Failed to add/update employee. This email is already registered", 'error');
+    showFieldError('email', 'This email is already registered');
+  } finally {
     saveBtn.disabled = false;
     saveBtn.innerHTML = originalText;
   }
