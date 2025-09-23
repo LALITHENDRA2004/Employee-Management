@@ -2,6 +2,7 @@ package net.javaguides.ems.controller;
 
 import lombok.AllArgsConstructor;
 import net.javaguides.ems.dto.EmployeeDto;
+import net.javaguides.ems.entity.Employee;
 import net.javaguides.ems.entity.User;
 import net.javaguides.ems.service.EmployeeService;
 import net.javaguides.ems.service.UserService;
@@ -57,8 +58,7 @@ public class EmployeeController {
     // Build Add Employee REST API
     @PostMapping
     public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto, 
-                                                        @AuthenticationPrincipal UserDetails userDetails) {
-        User user = getCurrentUser(userDetails);
+                                                        @AuthenticationPrincipal UserDetails userDetails) {                                                            User user = getCurrentUser(userDetails);
         // here employeeService is a reference variable of interface EmployeeService
         // But it only have method declaration but not definition. 
         // Here the Spring Boot creates an object by itself by finding the class 

@@ -540,6 +540,8 @@ body {
   min-width: 300px;
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .toast.error .toast-content {

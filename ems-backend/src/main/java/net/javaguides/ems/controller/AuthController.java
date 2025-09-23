@@ -1,10 +1,13 @@
 package net.javaguides.ems.controller;
 
 import net.javaguides.ems.dto.JwtResponse;
+import net.javaguides.ems.dto.UserRequestDto;
 import net.javaguides.ems.entity.User;
 import net.javaguides.ems.repository.UserRepository;
 import net.javaguides.ems.security.JwtTokenUtil;
 
+import java.util.Collections;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,24 +34,46 @@ public class AuthController {
     private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        if (userRepository.existsByUserName(user.getUserName())) {
-            return ResponseEntity.badRequest().body("Username is already taken.");
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequestDto userRequest) {
+        if (userRepository.existsByUserName(userRequest.getUserName())) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Username is already taken."));
         }
 
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        // Encode the password and save the user
+        User user = new User();
+        user.setUserName(userRequest.getUserName());
+        user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
         userRepository.save(user);
 
-        return ResponseEntity.ok("User registered successfully");
+        try {
+            // Authenticate newly registered user
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    user.getUserName(),
+                    userRequest.getPassword()
+                )
+            );
+
+            // Generate JWT token for the user
+            String jwt = jwtTokenUtil.generateToken(userRequest.getUserName());
+
+            // Return the token in the response
+            return ResponseEntity.ok(new JwtResponse(jwt));
+
+        } catch (AuthenticationException ex) {
+            // Fallback: return success message without token if authentication fails for some reason
+            return ResponseEntity.ok(Collections.singletonMap("message", "User registered successfully, but failed to authenticate."));
+        }
     }
 
+
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody User loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserRequestDto loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.getUserName(),
-                    loginRequest.getPasswordHash()
+                    loginRequest.getPassword()
                 )
             );
 
@@ -57,7 +82,7 @@ public class AuthController {
             return ResponseEntity.ok(new JwtResponse(jwt));
 
         } catch (AuthenticationException ex) {
-            return ResponseEntity.status(401).body("Invalid username or password");
+            return ResponseEntity.status(401).body(Collections.singletonMap("error", "Invalid username or password"));
         }
     }
 }
