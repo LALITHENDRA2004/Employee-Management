@@ -66,7 +66,7 @@ window.addEventListener('DOMContentLoaded', () => {
         alert('Please enter your password.');
         return;
       }
-      
+
       signin();
     });
   }
@@ -86,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
         alert('Please enter a password to sign up.');
         return;
       }
-      
+
       signup();
     });
   }
@@ -102,32 +102,32 @@ function signup() {
   fetch('http://localhost:8080/auth/signup', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json', 
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       userName: username,
-      password: password, 
+      password: password,
     }),
   })
-  .then(response => {
-    if(response.ok) {
-      return response.json(); 
-    } else {
-      return response.text().then(text => {throw new Error(text)});
-    }
-  })
-  .then(data => {
-    if(data.token) {
-      localStorage.setItem('jwtToken', data.token); 
-      localStorage.setItem('loggedInUser', username);
-      alert('Signup successful. Redirecting...');
-      window.location.href = 'http://127.0.0.1:5500/ems-frontend/mainPage.html';
-    } else {
-      alert('Signup successful but no token returned. Please login.');
-      window.location.href = 'login.html';
-    }
-  })
-  .catch(error => alert('Signup failed: ' + error.message));
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        return response.text().then(text => { throw new Error(text) });
+      }
+    })
+    .then(data => {
+      if (data.token) {
+        localStorage.setItem('jwtToken', data.token);
+        localStorage.setItem('loggedInUser', username);
+        alert('Signup successful. Redirecting...');
+        window.location.href = '../mainPage.html';
+      } else {
+        alert('Signup successful but no token returned. Please login.');
+        window.location.href = 'login.html';
+      }
+    })
+    .catch(error => alert('Signup failed: ' + error.message));
 }
 
 function signin() {
@@ -137,7 +137,7 @@ function signin() {
   fetch('http://localhost:8080/auth/signin', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json', 
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       userName: username,
@@ -148,10 +148,10 @@ function signin() {
     .then(data => {
       try {
         if (data.token) {
-          localStorage.setItem('jwtToken', data.token); 
+          localStorage.setItem('jwtToken', data.token);
           localStorage.setItem('loggedInUser', username);
           alert('Login successful. Redirecting...');
-          window.location.href = 'http://127.0.0.1:5500/ems-frontend/mainPage.html';
+          window.location.href = '../mainPage.html';
         } else {
           alert('Invalid username or password.');
         }
