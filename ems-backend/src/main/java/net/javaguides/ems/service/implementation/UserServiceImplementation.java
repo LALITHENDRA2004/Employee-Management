@@ -47,4 +47,16 @@ public class UserServiceImplementation implements UserService {
     public Optional<User> findByUserName(String userName) {
         return userRepository.findByUserName(userName);
     }
+
+    @Override
+    public boolean resetPassword(String userName, String newPassword) {
+        Optional<User> userOpt = userRepository.findByUserName(userName);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        User user = userOpt.get();
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
+    }
 }

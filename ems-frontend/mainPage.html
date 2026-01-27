@@ -11,31 +11,42 @@
 </head>
 
 <body>
-    <!-- Header -->
     <header class="header">
-        <div id="user-info" class="user-info">
-            <button id="profile-button" class="profile-button" aria-haspopup="true" aria-expanded="false"
-                aria-label="User menu"></button>
-
-            <!-- Hidden user account details panel -->
-            <div id="account-details" class="account-details" style="display: none;">
-                <p><strong>User:</strong> <span id="account-username"></span></p>
-                <button id="logout-button" class="logout-btn">Logout</button>
-            </div>
-        </div>
-
-
-
         <div class="container">
             <div class="header-content">
                 <h1 class="header-title">
                     <i class="fas fa-users"></i>
                     Employee Management System
                 </h1>
-                <button class="btn btn-primary add-employee-btn" id="addEmployeeBtn">
-                    <i class="fas fa-plus"></i>
-                    Add Employee
-                </button>
+                <div class="header-actions">
+                    <button class="btn btn-primary add-employee-btn" id="addEmployeeBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Employee
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="user-info" class="user-info">
+            <button id="profile-button" class="profile-button" aria-haspopup="true" aria-expanded="false"
+                aria-label="User menu"></button>
+
+            <!-- Professional user account details panel -->
+            <div id="account-details" class="account-details" style="display: none;">
+                <div class="details-header">
+                    <div class="header-avatar" id="header-avatar">U</div>
+                    <div class="header-info">
+                        <p class="user-name" id="account-username"></p>
+                        <p class="user-role">Administrator</p>
+                    </div>
+                </div>
+
+                <div class="details-footer">
+                    <button id="logout-button" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                </div>
             </div>
         </div>
     </header>
