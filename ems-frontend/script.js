@@ -85,7 +85,7 @@ function setupEventListeners() {
 function initializeUserInfo() {
   const loggedInUser = localStorage.getItem('loggedInUser');
   if (!loggedInUser) {
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
     return;
   }
   // Show user info section
@@ -118,7 +118,7 @@ function toggleAccountDetails() {
 // Handle logout action
 function handleLogout() {
   localStorage.removeItem('loggedInUser');
-  window.location.href = './loginpage/login.html';
+  window.location.href = 'index.html';
 }
 
 // ------------ API Functions ------------
