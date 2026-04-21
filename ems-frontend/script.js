@@ -1,4 +1,6 @@
 // API Configuration
+// const API_BASE_URL = 'https://employee-management-dcf9.onrender.com/api/employees';
+
 const API_BASE_URL = 'http://localhost:8080/api/employees';
 
 // Global State
@@ -85,18 +87,23 @@ function setupEventListeners() {
 function initializeUserInfo() {
   const loggedInUser = localStorage.getItem('loggedInUser');
   if (!loggedInUser) {
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
     return;
   }
   // Show user info section
   userInfoDiv.style.display = 'flex';
+
   // Profile button: first uppercase letter
-  profileButton.textContent = loggedInUser.charAt(0).toUpperCase();
+  const initial = loggedInUser.charAt(0).toUpperCase();
+  profileButton.textContent = initial;
   profileButton.setAttribute('aria-expanded', 'false');
   profileButton.setAttribute('aria-haspopup', 'true');
   profileButton.setAttribute('aria-label', 'User menu');
-  // Set username in dropdown
-  accountUsername.textContent = loggedInUser;
+
+  // Populating new profile dropdown fields
+  const headerAvatar = document.getElementById('header-avatar');
+  if (headerAvatar) headerAvatar.textContent = initial;
+  if (accountUsername) accountUsername.textContent = loggedInUser;
 }
 
 // Toggle user account details panel visibility
@@ -113,7 +120,7 @@ function toggleAccountDetails() {
 // Handle logout action
 function handleLogout() {
   localStorage.removeItem('loggedInUser');
-  window.location.href = './loginpage/login.html';
+  window.location.href = 'index.html';
 }
 
 // ------------ API Functions ------------
