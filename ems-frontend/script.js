@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = 'https://employee-management-i4e5.onrender.com';
+const API_BASE_URL = 'https://employee-management-d3bp.onrender.com/api/employees';
 
 // Global State
 let employees = [];

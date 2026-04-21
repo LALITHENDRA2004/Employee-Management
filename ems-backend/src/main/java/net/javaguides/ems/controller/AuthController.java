@@ -1,6 +1,7 @@
 package net.javaguides.ems.controller;
 
 import net.javaguides.ems.dto.JwtResponse;
+import net.javaguides.ems.dto.ResetPasswordDto;
 import net.javaguides.ems.dto.UserRequestDto;
 import net.javaguides.ems.entity.User;
 import net.javaguides.ems.repository.UserRepository;
@@ -84,5 +85,16 @@ public class AuthController {
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(401).body(Collections.singletonMap("error", "Invalid username or password"));
         }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDto resetRequest) {
+        return userRepository.findByUserName(resetRequest.getUserName())
+            .map(user -> {
+                user.setPasswordHash(passwordEncoder.encode(resetRequest.getNewPassword()));
+                userRepository.save(user);
+                return ResponseEntity.ok(Collections.singletonMap("message", "Password successfully reset."));
+            })
+            .orElseGet(() -> ResponseEntity.status(404).body(Collections.singletonMap("error", "User not found.")));
     }
 }
