@@ -119,7 +119,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch('https://employee-management-d3bp.onrender.com/auth/reset-password', {
+            fetch('https://employee-management-i4e5.onrender.com/auth/reset-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function signup(username, password) {
-    fetch('https://employee-management-d3bp.onrender.com/auth/signup', {
+    fetch('https://employee-management-i4e5.onrender.com/auth/signup', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ function signup(username, password) {
 }
 
 function signin(username, password) {
-    fetch('https://employee-management-d3bp.onrender.com/auth/signin', {
+    fetch('https://employee-management-i4e5.onrender.com/auth/signin', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
