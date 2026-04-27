@@ -1,8 +1,11 @@
 package net.javaguides.ems.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import javax.crypto.SecretKey;
 
 import java.util.Date;
 
@@ -15,33 +18,41 @@ public class JwtTokenUtil {
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
 
-    // Generate JWT token for a username
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    // Generate JWT token
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    // Extract username from JWT token
+    // Extract username
     public String getUsernameFromToken(String token) {
-        return Jwts.parser()
-                   .setSigningKey(jwtSecret)
-                   .parseClaimsJws(token)
-                   .getBody()
-                   .getSubject();
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
-    // Validate the JWT token
+    // Validate token
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            // You can log the exception message here if needed
+            return false;
         }
-        return false;
     }
 }
